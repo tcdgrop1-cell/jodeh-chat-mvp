@@ -1,5 +1,12 @@
 import type { RegistrationDraft } from './types';
 
+export function normalizeDigits(value: string, maxLength?: number) {
+  const normalized = value
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)))
+    .replace(/[^0-9]/g, '');
+  return typeof maxLength === 'number' ? normalized.slice(0, maxLength) : normalized;
+}
+
 export function buildHierarchyId(draft: RegistrationDraft) {
   return [
     draft.countryCode,
@@ -12,7 +19,7 @@ export function buildHierarchyId(draft: RegistrationDraft) {
     draft.fatherCode,
     draft.nameCode,
   ]
-    .map((part, index) => index === 0 ? part.padStart(3, '0') : part.padStart(2, '0'))
+    .map((part, index) => (index === 0 ? part.padStart(3, '0') : part.padStart(2, '0')))
     .join('');
 }
 
