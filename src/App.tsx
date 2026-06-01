@@ -1,4 +1,4 @@
-import { Fingerprint, MessageSquareQuote, ShieldCheck, Sparkles } from 'lucide-react';
+import { MessageSquareMore, Sparkles, ShieldCheck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { ChatShell } from './components/ChatShell';
 import { ProfileCard } from './components/ProfileCard';
@@ -37,7 +37,7 @@ export default function App() {
     document.title = 'جوده شات';
     const description = document.querySelector('meta[name="description"]');
     if (description) {
-      description.setAttribute('content', rtl ? 'جوده شات - تجربة مراسلة فاخرة ومنظمة مع تسجيل ذكي وهيكل هوية مرن.' : 'Jodeh Chat - a premium organized messaging experience with smart registration and a flexible identity structure.');
+      description.setAttribute('content', rtl ? 'جوده شات - واجهة مراسلة داكنة فاخرة مستوحاة من واتساب.' : 'Jodeh Chat - a luxurious WhatsApp-inspired dark messaging interface.');
     }
   }, [activeLanguage, rtl]);
 
@@ -72,57 +72,37 @@ export default function App() {
   }
 
   return (
-    <div dir={rtl ? 'rtl' : 'ltr'} className="min-h-screen bg-[radial-gradient(circle_at_top,#10264d_0%,#07101f_36%,#030712_100%)] text-slate-50">
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(56,189,248,0.08),transparent_35%,rgba(255,255,255,0.02))]" />
-      <main className="relative mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
-        <header className="mb-6 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_25px_90px_rgba(2,8,23,0.42)] backdrop-blur-2xl">
-          <div className="flex flex-col gap-5 border-b border-white/10 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-6">
-            <div className={`flex items-center gap-4 ${rtl ? 'text-right' : 'text-left'}`}>
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-sky-300 via-sky-400 to-white text-slate-950 shadow-lg shadow-sky-500/25">
-                <Sparkles className="h-7 w-7" />
-              </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.38em] text-sky-200/80">{i18n.appName}</div>
-                <h1 className="mt-1 text-2xl font-semibold text-white md:text-3xl">{i18n.tagline}</h1>
-              </div>
+    <div dir={rtl ? 'rtl' : 'ltr'} className="relative min-h-screen overflow-hidden bg-[#05070c] text-slate-50">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,211,102,0.14),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(13,148,136,0.18),transparent_28%),linear-gradient(180deg,#05070c_0%,#070b12_100%)]" />
+      <main className="relative mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
+        <header className="mb-5 flex items-center justify-between rounded-[1.6rem] border border-white/10 bg-[#0f151c]/85 px-4 py-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+          <div className={`flex items-center gap-3 ${rtl ? 'text-right' : 'text-left'}`}>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#25d366]/12 text-[#9dffbd]">
+              <Sparkles className="h-6 w-6" />
             </div>
-            <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[560px]">
-              <HeaderChip icon={Fingerprint} title={i18n.hierarchyId} subtitle={rtl ? 'معرّف موحد' : 'Unified ID'} />
-              <HeaderChip icon={ShieldCheck} title={i18n.secure} subtitle={rtl ? 'جاهز للتشفير' : 'Encryption-ready'} />
-              <HeaderChip icon={MessageSquareQuote} title={i18n.messagingCore} subtitle={rtl ? 'P2P + Groups + Channels' : 'P2P + Groups + Channels'} />
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.34em] text-white/38">{i18n.appName}</div>
+              <h1 className="mt-1 text-lg font-semibold text-white sm:text-xl">{rtl ? 'واجهة مراسلة فخمة مستوحاة من واتساب' : 'Premium WhatsApp-inspired messaging UI'}</h1>
             </div>
           </div>
-          <div className={`px-5 py-4 text-sm text-slate-300 lg:px-6 ${rtl ? 'text-right' : 'text-left'}`}>
-            {rtl
-              ? 'اختر بياناتك الأساسية ثم أكمل بقية الهيكل الهرمي. الواجهة ثابتة على اللغة التي اخترتها.'
-              : 'Choose your core details first, then continue through the hierarchy. The interface stays locked to your selected language.'}
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
+            <ShieldCheck className="h-4 w-4 text-[#25d366]" />
+            {rtl ? 'وضع داكن' : 'Dark mode'}
           </div>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(430px,0.98fr)]">
           <section className="space-y-6">
-            <RegistrationWizard language={language} onComplete={(draft) => setProfile(draft)} />
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <FeatureCard
-                title={i18n.appearance}
-                text={rtl ? 'ألوان عميقة، تباين نظيف، ومسافات مريحة تعطي إحساسًا فاخرًا.' : 'Deep colors, clean contrast, and generous spacing for a premium feel.'}
-              />
-              <FeatureCard
-                title={i18n.privacy}
-                text={rtl ? 'نهج أمني واضح: حظر، بلاغ، واسترجاع حساب مع سياسات رؤية دقيقة.' : 'Privacy-first design with block/report, account recovery, and precise data visibility policies.'}
-              />
-            </div>
+            <RegistrationWizard language={activeLanguage} onComplete={(draft) => setProfile(draft)} />
           </section>
 
-          <section className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+          <section className="space-y-6 xl:sticky xl:top-6 xl:self-start">
             <ProfileCard
               language={activeLanguage}
               hierarchyId={profile?.hierarchyId ?? fallbackProfile}
               nameAr={profile ? profile.quadNameAr || profile.quadNameEn : rtl ? 'اسم رباعي تجريبي' : 'Demo quad name'}
               nameEn={profile ? profile.quadNameEn || profile.quadNameAr : 'Demo quad name'}
             />
-
             <ChatShell language={activeLanguage} />
           </section>
         </div>
@@ -133,71 +113,53 @@ export default function App() {
 
 function LanguageGate({ onSelect }: { onSelect: (language: Language) => void }) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#10264d_0%,#07101f_36%,#030712_100%)] px-4 py-8 text-slate-50">
-      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-8 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="space-y-6 rounded-[2.5rem] border border-white/10 bg-white/5 p-8 shadow-[0_35px_120px_rgba(2,8,23,0.45)] backdrop-blur-2xl">
-          <div className="inline-flex rounded-full border border-sky-400/20 bg-sky-400/10 px-4 py-2 text-xs uppercase tracking-[0.32em] text-sky-100">جوده شات</div>
-          <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-white md:text-6xl">
-            تجربة مراسلة فاخرة، مرتبة، وسريعة للمجتمعات الثنائية اللغة
-          </h1>
-          <p className="max-w-2xl text-lg leading-8 text-slate-300">
-            اختر اللغة مرة واحدة فقط، ثم ادخل مباشرة إلى تسجيل أنيق يبدأ برقم الهاتف والاسم الرباعي واللقب قبل الهيكل الهرمي.
-          </p>
-          <div className="grid gap-4 md:grid-cols-2">
-            <button onClick={() => onSelect('ar')} className="rounded-[1.75rem] border border-white/10 bg-[#081225] p-6 text-right transition hover:border-sky-400/40 hover:bg-[#0a152a]">
-              <div className="text-2xl font-semibold text-white">العربية</div>
-              <div className="mt-2 text-sm leading-7 text-slate-300">واجهة من اليمين إلى اليسار مع دخول فاخر ومنظم.</div>
-            </button>
-            <button onClick={() => onSelect('en')} className="rounded-[1.75rem] border border-white/10 bg-[#081225] p-6 text-left transition hover:border-sky-400/40 hover:bg-[#0a152a]">
-              <div className="text-2xl font-semibold text-white">English</div>
-              <div className="mt-2 text-sm leading-7 text-slate-300">A refined left-to-right experience with premium onboarding.</div>
-            </button>
+    <div className="min-h-screen bg-[#05070c] px-4 py-8 text-slate-50">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center justify-center">
+        <div className="grid w-full gap-6 rounded-[2rem] border border-white/10 bg-[#0f151c]/90 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.38)] backdrop-blur-xl lg:grid-cols-[1.02fr_0.98fr] lg:p-8">
+          <div className="space-y-5 rounded-[1.75rem] border border-white/10 bg-[#0b1118] p-6">
+            <div className="inline-flex rounded-full border border-[#25d366]/25 bg-[#25d366]/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-[#9dffbd]">
+              جوده شات
+            </div>
+            <h1 className="text-4xl font-semibold leading-tight tracking-[-0.04em] text-white sm:text-5xl">
+              {rtl ? 'تجربة مراسلة داكنة وفخمة بلمسة واتساب' : 'A luxurious dark messaging experience with a WhatsApp feel'}
+            </h1>
+            <p className="max-w-xl text-base leading-8 text-white/58 sm:text-lg">
+              {rtl ? 'اختر اللغة مرة واحدة ثم ادخل إلى واجهة تسجيل ودردشة بسيطة، نظيفة، ومهيأة للجوال.' : 'Choose a language once, then enter a clean, mobile-first registration and chat experience.'}
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button onClick={() => onSelect('ar')} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 text-right transition hover:border-[#25d366]/30 hover:bg-[#25d366]/12">
+                <div className="text-2xl font-semibold text-white">العربية</div>
+                <div className="mt-2 text-sm leading-7 text-white/55">واجهة RTL مع طابع هادئ ومميز.</div>
+              </button>
+              <button onClick={() => onSelect('en')} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 text-left transition hover:border-[#25d366]/30 hover:bg-[#25d366]/12">
+                <div className="text-2xl font-semibold text-white">English</div>
+                <div className="mt-2 text-sm leading-7 text-white/55">A clean LTR experience with premium dark styling.</div>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="rounded-[2.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-6 shadow-[0_35px_120px_rgba(2,8,23,0.45)] backdrop-blur-2xl">
-          <div className="rounded-[2rem] border border-white/10 bg-[#071222] p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <div className="text-xs uppercase tracking-[0.32em] text-sky-200/70">Security • UX • Hierarchy</div>
-                <div className="mt-2 text-2xl font-semibold text-white">Premium chat foundation</div>
+          <div className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5">
+            <div className="rounded-[1.55rem] border border-white/10 bg-[#0b1118] p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/40">Messaging</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">Premium dark shell</h2>
+                </div>
+                <MessageSquareMore className="h-8 w-8 text-[#25d366]" />
               </div>
-              <ShieldCheck className="h-8 w-8 text-sky-300" />
-            </div>
-            <div className="space-y-3 text-sm leading-7 text-slate-300">
-              <p>• WhatsApp-like simplicity</p>
-              <p>• Telegram-like scale for groups and channels</p>
-              <p>• Clean RTL and LTR rendering</p>
-              <p>• Flexible identity structure</p>
+              <div className="space-y-3 text-sm leading-7 text-white/58">
+                <p>• WhatsApp-like navigation and chat list structure</p>
+                <p>• Dark luxury colors with green accents</p>
+                <p>• Arabic-first registration flow</p>
+                <p>• Combo-style searchable text lists for clan and title</p>
+              </div>
+              <div className="mt-6 rounded-[1.2rem] border border-[#25d366]/20 bg-[#25d366]/10 px-4 py-3 text-sm text-[#9dffbd]">
+                {rtl ? 'الواجهة جاهزة على نمط واتساب مع ألوان أكثر فخامة.' : 'The UI is ready in a WhatsApp-inspired layout with a more luxurious palette.'}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function HeaderChip({ icon: Icon, title, subtitle }: { icon: typeof Fingerprint; title: string; subtitle: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-[#081225] px-4 py-3">
-      <div className="flex items-center gap-3">
-        <div className="grid h-10 w-10 place-items-center rounded-xl bg-sky-400/10 text-sky-200">
-          <Icon className="h-5 w-5" />
-        </div>
-        <div>
-          <div className="text-sm font-medium text-white">{title}</div>
-          <div className="text-xs text-slate-400">{subtitle}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FeatureCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 backdrop-blur-2xl">
-      <div className="text-sm font-medium uppercase tracking-[0.24em] text-sky-200/80">{title}</div>
-      <p className="mt-3 text-sm leading-7 text-slate-300">{text}</p>
     </div>
   );
 }
