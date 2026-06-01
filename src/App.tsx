@@ -37,7 +37,7 @@ export default function App() {
     document.title = 'جوده شات';
     const description = document.querySelector('meta[name="description"]');
     if (description) {
-      description.setAttribute('content', rtl ? 'جوده شات - تجربة مراسلة فاخرة ومنظمة مع تسجيل ذكي وهيكل هرمي 19 رقمًا.' : 'Jodeh Chat - a premium organized messaging experience with smart registration and a 19-digit hierarchy.');
+      description.setAttribute('content', rtl ? 'جوده شات - تجربة مراسلة فاخرة ومنظمة مع تسجيل ذكي وهيكل هوية مرن.' : 'Jodeh Chat - a premium organized messaging experience with smart registration and a flexible identity structure.');
     }
   }, [activeLanguage, rtl]);
 
@@ -87,7 +87,7 @@ export default function App() {
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[560px]">
-              <HeaderChip icon={Fingerprint} title={i18n.hierarchyId} subtitle={rtl ? '19 رقمًا موحدًا' : 'Unified 19 digits'} />
+              <HeaderChip icon={Fingerprint} title={i18n.hierarchyId} subtitle={rtl ? 'معرّف موحد' : 'Unified ID'} />
               <HeaderChip icon={ShieldCheck} title={i18n.secure} subtitle={rtl ? 'جاهز للتشفير' : 'Encryption-ready'} />
               <HeaderChip icon={MessageSquareQuote} title={i18n.messagingCore} subtitle={rtl ? 'P2P + Groups + Channels' : 'P2P + Groups + Channels'} />
             </div>
@@ -168,7 +168,7 @@ function LanguageGate({ onSelect }: { onSelect: (language: Language) => void }) 
               <p>• WhatsApp-like simplicity</p>
               <p>• Telegram-like scale for groups and channels</p>
               <p>• Clean RTL and LTR rendering</p>
-              <p>• 19-digit hierarchy-aware identity</p>
+              <p>• Flexible identity structure</p>
             </div>
           </div>
         </div>
