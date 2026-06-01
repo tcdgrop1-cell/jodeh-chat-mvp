@@ -27,16 +27,19 @@ const defaultDraft: RegistrationDraft = {
   governorateCode: '01',
   districtCode: '01',
   villageCode: '01',
-  clanCode: '01',
-  titleCode: '01',
-  grandfatherCode: '01',
-  fatherCode: '01',
-  nameCode: '01',
+  clanCode: '',
+  titleCode: '',
+  grandfatherCode: '',
+  fatherCode: '',
+  nameCode: '',
 };
 
 const steps = ['identity', 'demographics', 'country', 'governorate', 'district', 'village', 'lineage', 'review'] as const;
 type StepKey = (typeof steps)[number];
 type PickerKind = 'education' | 'gender' | 'country' | 'governorate' | 'district' | 'village';
+
+const clanSuggestions = ['آل سالم', 'آل علي', 'آل أحمد', 'آل حسن', 'بني هاشم', 'بني تميم'];
+const titleSuggestions = ['السيد', 'الشيخ', 'الأستاذ', 'الدكتور', 'القاضي', 'الحاج'];
 
 function getCountry(code: string) {
   return COUNTRIES.find((country) => country.code === code) ?? COUNTRIES[0];
@@ -334,23 +337,83 @@ export function RegistrationWizard({ language, onComplete }: Props) {
         );
       case 'lineage':
         return (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <label className="block">
-              <span className="mb-2 block text-sm text-slate-300">{i18n.clan}</span>
-              <input value={draft.clanCode} onChange={(e) => update('clanCode', normalizeDigits(e.target.value, 2))} maxLength={2} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-sm text-slate-300">{i18n.title}</span>
-              <input value={draft.titleCode} onChange={(e) => update('titleCode', normalizeDigits(e.target.value, 2))} maxLength={2} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-sm text-slate-300">{i18n.grandfather}</span>
-              <input value={draft.grandfatherCode} onChange={(e) => update('grandfatherCode', normalizeDigits(e.target.value, 2))} maxLength={2} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-sm text-slate-300">{i18n.father}</span>
-              <input value={draft.fatherCode} onChange={(e) => update('fatherCode', normalizeDigits(e.target.value, 2))} maxLength={2} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
-            </label>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <label className="block">
+                <span className="mb-2 block text-sm text-slate-300">{i18n.grandfather}</span>
+                <input
+                  type="text"
+                  value={draft.grandfatherCode}
+                  onChange={(e) => update('grandfatherCode', e.target.value)}
+                  maxLength={80}
+                  placeholder={rtl ? 'اكتب اسم الجد' : 'Enter grandfather name'}
+                  className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm text-slate-300">{i18n.father}</span>
+                <input
+                  type="text"
+                  value={draft.fatherCode}
+                  onChange={(e) => update('fatherCode', e.target.value)}
+                  maxLength={80}
+                  placeholder={rtl ? 'اكتب اسم الأب' : 'Enter father name'}
+                  className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm text-slate-300">{i18n.name}</span>
+                <input
+                  type="text"
+                  value={draft.nameCode}
+                  onChange={(e) => update('nameCode', e.target.value)}
+                  maxLength={80}
+                  placeholder={rtl ? 'اكتب الاسم' : 'Enter name'}
+                  className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block">
+                <span className="mb-2 block text-sm text-slate-300">{i18n.clan}</span>
+                <input
+                  type="text"
+                  list="clan-options"
+                  value={draft.clanCode}
+                  onChange={(e) => update('clanCode', e.target.value)}
+                  maxLength={80}
+                  placeholder={rtl ? 'اكتب العصبة أو اختر من القائمة' : 'Type a clan or pick from the list'}
+                  className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                />
+                <datalist id="clan-options">
+                  {clanSuggestions.map((item) => (
+                    <option key={item} value={item} />
+                  ))}
+                </datalist>
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-sm text-slate-300">{i18n.title}</span>
+                <input
+                  type="text"
+                  list="title-options"
+                  value={draft.titleCode}
+                  onChange={(e) => update('titleCode', e.target.value)}
+                  maxLength={80}
+                  placeholder={rtl ? 'اكتب اللقب أو اختر من القائمة' : 'Type a title or pick from the list'}
+                  className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                />
+                <datalist id="title-options">
+                  {titleSuggestions.map((item) => (
+                    <option key={item} value={item} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
+
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-300">
+              {rtl ? 'الجد والأب والاسم تُكتب كتابة مباشرة، بينما العصبة واللقب يمكن اختيارهما من قائمة قابلة للبحث أو إدخال قيمة جديدة.' : 'Grandfather, father, and name are typed directly, while clan and title can be searched in a combo-style list or entered manually.'}
+            </div>
           </div>
         );
       case 'review':
