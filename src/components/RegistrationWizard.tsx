@@ -423,7 +423,7 @@ export function RegistrationWizard({ language, onComplete }: Props) {
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-2 block text-sm text-slate-300">{i18n.name}</span>
-                  <input value={draft.nameCode} onChange={(e) => update('nameCode', normalizeDigits(e.target.value, 2))} maxLength={2} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
+                  <input value={draft.nameCode} onChange={(e) => update('nameCode', e.target.value)} maxLength={80} className="w-full rounded-[1.6rem] border border-white/10 bg-[#071222] px-4 py-4 text-sm text-slate-100 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20" />
                 </label>
                 <label className="block">
                   <span className="mb-2 block text-sm text-slate-300">{rtl ? 'المعرّف الهرمي' : 'Hierarchy ID'}</span>
@@ -478,7 +478,7 @@ export function RegistrationWizard({ language, onComplete }: Props) {
               <h2 className={`mt-2 text-2xl font-semibold text-white sm:text-3xl ${rtl ? 'text-right' : 'text-left'}`}>{rtl ? 'ابدأ التسجيل بشكل أنيق ومختصر' : 'Start registration with a clean, premium flow'}</h2>
               <p className={`mt-2 max-w-3xl text-sm leading-7 text-slate-300 ${rtl ? 'text-right' : 'text-left'}`}>
                 {rtl
-                  ? 'اللغة ثابتة طوال الجلسة، والاختيارات تظهر في قوائم متحركة شبيهة بواتساب، مع تنظيم واضح ومسافات مريحة.'
+                  ? 'اللغة ثابتة طوال الجلسة، والاختيارات تظهر في قوائم متح��كة شبيهة بواتساب، مع تنظيم واضح ومسافات مريحة.'
                   : 'The selected language stays locked for the entire session, and the choice fields open in WhatsApp-style sheets with clean spacing and smooth motion.'}
               </p>
             </div>
