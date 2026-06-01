@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "echo 'using committed dist bundle'"
   publish = "dist"
 
 [[redirects]]
