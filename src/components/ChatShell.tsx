@@ -1,183 +1,285 @@
-import { Archive, CheckCheck, Clock3, Eye, FileAudio2, Image, Mic, Paperclip, Phone, Send, ShieldAlert, SmilePlus, Video, MessageSquareMore } from 'lucide-react';
+import {
+  Archive,
+  Camera,
+  CircleDashed,
+  UsersRound,
+  Filter,
+  MessageCircleMore,
+  MoreVertical,
+  Phone,
+  Plus,
+  Search,
+  Users,
+  Video,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { ChatKind, Language } from '../lib/types';
-import { t } from '../lib/i18n';
 
-interface Conversation {
+interface ChatItem {
   id: string;
   kind: ChatKind;
-  titleAr: string;
-  titleEn: string;
-  subtitleAr: string;
-  subtitleEn: string;
-  unread?: number;
-}
-
-interface Message {
-  id: string;
-  sender: string;
-  text: string;
-  mine?: boolean;
-  status?: 'sent' | 'delivered' | 'read';
+  nameAr: string;
+  nameEn: string;
+  previewAr: string;
+  previewEn: string;
   time: string;
+  unread?: number;
+  muted?: boolean;
+  pinned?: boolean;
+  accent: string;
 }
 
-const conversations: Conversation[] = [
-  { id: '1', kind: 'dm', titleAr: 'أحمد العزي', titleEn: 'Ahmed Al-Azi', subtitleAr: 'رسالة خاصة', subtitleEn: 'Direct message', unread: 2 },
-  { id: '2', kind: 'group', titleAr: 'مجموعة الحي', titleEn: 'Neighborhood Group', subtitleAr: '256 عضو', subtitleEn: '256 members' },
-  { id: '3', kind: 'channel', titleAr: 'قناة الجهود', titleEn: 'Jodeh Broadcast', subtitleAr: 'نشر رسمي', subtitleEn: 'Official broadcast' },
+const chats: ChatItem[] = [
+  {
+    id: '1',
+    kind: 'group',
+    nameAr: 'مجموعة الجوده',
+    nameEn: 'Jodeh Group',
+    previewAr: 'تمت إضافة الاسم الجديد إلى القائمة',
+    previewEn: 'A new name was added to the list',
+    time: '09:42',
+    unread: 4,
+    pinned: true,
+    accent: 'from-emerald-400 via-teal-400 to-cyan-300',
+  },
+  {
+    id: '2',
+    kind: 'dm',
+    nameAr: 'أحمد العزي',
+    nameEn: 'Ahmed Al-Azi',
+    previewAr: 'أرسل لي النسخة الجديدة بعد التعديل',
+    previewEn: 'Send me the updated version',
+    time: '08:17',
+    unread: 1,
+    accent: 'from-fuchsia-400 via-pink-400 to-amber-300',
+  },
+  {
+    id: '3',
+    kind: 'channel',
+    nameAr: 'قناة التحديثات',
+    nameEn: 'Updates Channel',
+    previewAr: 'تم نشر واجهة التسجيل المحدثة',
+    previewEn: 'Updated registration UI published',
+    time: 'أمس',
+    muted: true,
+    accent: 'from-sky-400 via-cyan-300 to-emerald-300',
+  },
+  {
+    id: '4',
+    kind: 'group',
+    nameAr: 'عائلة الجوده',
+    nameEn: 'Jodeh Family',
+    previewAr: 'الجد والأب والاسم أصبحت كتابة مباشرة',
+    previewEn: 'Grandfather, father, and name are now text fields',
+    time: '07:05',
+    unread: 8,
+    accent: 'from-amber-300 via-orange-400 to-rose-400',
+  },
+  {
+    id: '5',
+    kind: 'dm',
+    nameAr: 'سارة',
+    nameEn: 'Sara',
+    previewAr: 'هل نجعل الألوان أفخم وأكثر هدوءًا؟',
+    previewEn: 'Should we make the colors more luxurious and calm?',
+    time: '06:48',
+    accent: 'from-violet-400 via-indigo-400 to-sky-300',
+  },
+  {
+    id: '6',
+    kind: 'channel',
+    nameAr: 'مجتمع الأعضاء',
+    nameEn: 'Members Community',
+    previewAr: 'الواجهة الآن أقرب لواتساب مع طابع داكن فخم',
+    previewEn: 'The UI is now closer to WhatsApp with a premium dark tone',
+    time: '05:11',
+    muted: true,
+    accent: 'from-lime-300 via-emerald-400 to-teal-300',
+  },
 ];
 
-const demoMessages: Message[] = [
-  { id: 'm1', sender: 'Ahmed', text: 'جاهز نجرب النسخة الجديدة؟', time: '09:12', status: 'read' },
-  { id: 'm2', sender: 'You', text: 'نعم، الواجهة أصبحت أفخم وأكثر ترتيبًا الآن.', mine: true, time: '09:13', status: 'read' },
-  { id: 'm3', sender: 'Ahmed', text: 'أرسل لي ملف الإعدادات لو سمحت.', time: '09:13', status: 'delivered' },
-  { id: 'm4', sender: 'You', text: 'تم الإرسال. المرفق والصوت والصورة مدعومة.', mine: true, time: '09:14', status: 'sent' },
-];
+const tabs = [
+  { id: 'chats', labelAr: 'الدردشات', labelEn: 'Chats', icon: MessageCircleMore },
+  { id: 'updates', labelAr: 'التحديثات', labelEn: 'Updates', icon: CircleDashed },
+  { id: 'communities', labelAr: 'المجتمعات', labelEn: 'Communities', icon: UsersRound },
+  { id: 'calls', labelAr: 'المكالمات', labelEn: 'Calls', icon: Phone },
+] as const;
+
+const filters = [
+  { id: 'all', labelAr: 'الكل', labelEn: 'All', icon: null },
+  { id: 'unread', labelAr: 'غير المقروءة', labelEn: 'Unread', icon: Filter },
+  { id: 'groups', labelAr: 'المجموعات', labelEn: 'Groups', icon: Users },
+  { id: 'archived', labelAr: 'الأرشيف', labelEn: 'Archived', icon: Archive },
+] as const;
+
+type FilterKey = (typeof filters)[number]['id'];
+type TabKey = (typeof tabs)[number]['id'];
 
 export function ChatShell({ language }: { language: Language }) {
-  const i18n = useMemo(() => t(language), [language]);
   const rtl = language === 'ar';
-  const [activeKind, setActiveKind] = useState<ChatKind>('group');
-  const filtered = conversations.filter((item) => item.kind === activeKind);
+  const [activeTab, setActiveTab] = useState<TabKey>('chats');
+  const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
+  const [query, setQuery] = useState('');
+
+  const visibleChats = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return chats.filter((chat) => {
+      if (activeTab !== 'chats') return true;
+      if (activeFilter === 'unread' && !chat.unread) return false;
+      if (activeFilter === 'groups' && chat.kind !== 'group') return false;
+      if (activeFilter === 'archived') return false;
+      if (!q) return true;
+      const haystack = [chat.nameAr, chat.nameEn, chat.previewAr, chat.previewEn].join(' ').toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [activeFilter, activeTab, query]);
+
+  const showChats = activeTab === 'chats';
 
   return (
-    <div dir={rtl ? 'rtl' : 'ltr'} className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(6,16,34,0.94),rgba(4,10,22,0.96))] shadow-[0_30px_120px_rgba(2,8,23,0.55)] backdrop-blur-2xl">
-      <div className={`flex items-center justify-between border-b border-white/8 px-5 py-5 sm:px-6 ${rtl ? 'text-right' : 'text-left'}`}>
-        <div>
-          <div className="text-xs uppercase tracking-[0.34em] text-sky-200/80">{i18n.messagingCore}</div>
-          <h3 className="mt-2 text-2xl font-semibold text-white">{rtl ? 'مركز المراسلة' : 'Messaging center'}</h3>
-        </div>
-        <div className="flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs text-emerald-200">
-          <CheckCheck className="h-4 w-4" /> {i18n.secure}
-        </div>
-      </div>
-
-      <div className="grid gap-0 xl:grid-cols-[280px_minmax(0,1fr)_280px]">
-        <aside className="border-b border-white/8 xl:border-b-0 xl:border-r xl:border-white/8">
-          <div className="p-4">
-            <div className="grid grid-cols-3 gap-2 rounded-2xl bg-white/5 p-2">
-              {([
-                ['dm', MessageSquareMore, i18n.directMessage],
-                ['group', Archive, i18n.group],
-                ['channel', ShieldAlert, i18n.channel],
-              ] as const).map(([kind, Icon, label]) => (
-                <button
-                  key={kind}
-                  onClick={() => setActiveKind(kind)}
-                  className={`rounded-2xl px-3 py-3 text-xs transition ${activeKind === kind ? 'bg-sky-400 text-slate-950' : 'text-slate-300 hover:bg-white/5'}`}
-                >
-                  <Icon className="mx-auto mb-1 h-4 w-4" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2 px-3 pb-4">
-            {filtered.map((item) => (
-              <button key={item.id} className="w-full rounded-[1.5rem] border border-white/8 bg-white/5 p-4 text-left transition hover:border-sky-400/35 hover:bg-white/8">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="font-medium text-white">{language === 'ar' ? item.titleAr : item.titleEn}</div>
-                    <div className="mt-1 text-xs text-slate-400">{language === 'ar' ? item.subtitleAr : item.subtitleEn}</div>
-                  </div>
-                  {item.unread ? <span className="rounded-full bg-sky-400 px-2.5 py-1 text-[11px] font-semibold text-slate-950">{item.unread}</span> : null}
-                </div>
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <section className="flex min-h-[640px] flex-col border-b border-white/8 xl:border-b-0 xl:border-r xl:border-white/8">
-          <div className="flex items-center justify-between border-b border-white/8 px-5 py-4 sm:px-6">
+    <div dir={rtl ? 'rtl' : 'ltr'} className="relative mx-auto w-full max-w-[430px] overflow-hidden rounded-[2.1rem] border border-white/10 bg-[#0b1118] shadow-[0_30px_100px_rgba(0,0,0,0.45)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,211,102,0.16),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_28%)]" />
+      <div className="relative flex h-[860px] flex-col">
+        <header className="border-b border-white/10 bg-[#111720]/95 px-4 pb-4 pt-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-3">
             <div className={rtl ? 'text-right' : 'text-left'}>
-              <div className="text-lg font-semibold text-white">{rtl ? 'مجموعة الحي الراقية' : 'Premium neighborhood group'}</div>
-              <div className="text-sm text-slate-400">{i18n.realTime}</div>
+              <p className="text-[11px] uppercase tracking-[0.38em] text-white/40">WhatsApp style</p>
+              <h3 className="mt-1 text-[1.95rem] font-semibold tracking-[-0.03em] text-white">
+                {rtl ? 'الدردشات' : 'Chats'}
+              </h3>
             </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <button className="grid h-10 w-10 place-items-center rounded-full border border-white/8 bg-white/5 transition hover:bg-white/10"><Phone className="h-4 w-4" /></button>
-              <button className="grid h-10 w-10 place-items-center rounded-full border border-white/8 bg-white/5 transition hover:bg-white/10"><Video className="h-4 w-4" /></button>
+            <div className="flex items-center gap-2 text-white/85">
+              <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 transition hover:bg-white/10">
+                <Camera className="h-4 w-4" />
+              </button>
+              <button className="grid h-10 w-10 place-items-center rounded-full bg-white/5 transition hover:bg-white/10">
+                <MoreVertical className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto px-5 py-5 sm:px-6">
-            {demoMessages.map((message) => (
-              <Bubble key={message.id} message={message} rtl={rtl} i18n={i18n} />
-            ))}
+          <div className="mt-4 flex items-center gap-3 rounded-[1.4rem] border border-white/10 bg-[#0d131a] px-4 py-3 shadow-inner shadow-black/10">
+            <Search className="h-4 w-4 text-white/40" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={rtl ? 'بحث' : 'Search'}
+              className={`w-full bg-transparent text-[15px] text-white outline-none placeholder:text-white/35 ${rtl ? 'text-right' : 'text-left'}`}
+            />
           </div>
 
-          <div className="border-t border-white/8 px-4 py-4 sm:px-5">
-            <div className="rounded-[1.7rem] border border-white/8 bg-[#071222] p-3">
-              <div className="mb-3 flex items-center gap-2 text-slate-400">
-                <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"><Paperclip className="h-4 w-4" /></button>
-                <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"><Image className="h-4 w-4" /></button>
-                <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"><FileAudio2 className="h-4 w-4" /></button>
-                <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"><SmilePlus className="h-4 w-4" /></button>
-                <button className="grid h-9 w-9 place-items-center rounded-full bg-white/5 transition hover:bg-white/10"><Mic className="h-4 w-4" /></button>
-              </div>
-              <div className={`flex items-end gap-3 rounded-[1.4rem] border border-white/8 bg-[#0b1728] px-4 py-3 ${rtl ? 'flex-row-reverse' : ''}`}>
-                <input
-                  placeholder={rtl ? 'اكتب رسالة، أو أرسل صورة/صوت/ملف...' : 'Write a message or send an image, audio, or file...'}
-                  className={`min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-500 ${rtl ? 'text-right' : 'text-left'}`}
-                />
-                <button className="inline-flex items-center gap-2 rounded-full bg-sky-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-300">
-                  <Send className="h-4 w-4" /> {rtl ? 'إرسال' : 'Send'}
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+            {filters.map((filter) => {
+              const selected = activeFilter === filter.id;
+              const Icon = filter.icon;
+              return (
+                <button
+                  key={filter.id}
+                  type="button"
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${selected ? 'border-[#25d366] bg-[#25d366]/12 text-[#9dffbd]' : 'border-white/10 bg-white/5 text-white/68 hover:bg-white/5'}`}
+                >
+                  {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
+                  {rtl ? filter.labelAr : filter.labelEn}
                 </button>
+              );
+            })}
+          </div>
+        </header>
+
+        <main className="relative flex-1 overflow-hidden">
+          {showChats ? (
+            <div className="h-full overflow-y-auto px-2 py-2">
+              <div className="space-y-1">
+                {visibleChats.map((chat) => (
+                  <button
+                    key={chat.id}
+                    type="button"
+                    className="group flex w-full items-center gap-3 rounded-[1.35rem] px-3 py-3 text-left transition hover:bg-white/5"
+                  >
+                    <div className={`relative grid h-14 w-14 shrink-0 place-items-center rounded-full bg-gradient-to-br ${chat.accent} p-[2px] shadow-lg shadow-black/25`}>
+                      <div className="grid h-full w-full place-items-center rounded-full bg-[#131a22] text-sm font-semibold text-white">
+                        {(rtl ? chat.nameAr : chat.nameEn).slice(0, 2)}
+                      </div>
+                      {chat.pinned ? <span className="absolute -bottom-1 left-0 rounded-full bg-[#25d366] px-1.5 py-0.5 text-[9px] font-semibold text-[#07110d] shadow-lg">{rtl ? 'مثبت' : 'PIN'}</span> : null}
+                    </div>
+
+                    <div className={`min-w-0 flex-1 ${rtl ? 'text-right' : 'text-left'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-[15px] font-medium text-white">{rtl ? chat.nameAr : chat.nameEn}</div>
+                          <div className="mt-1 truncate text-[13px] text-white/50">
+                            {rtl ? chat.previewAr : chat.previewEn}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-2 pl-2 text-[12px] text-white/38">
+                          <span>{chat.time}</span>
+                          {chat.muted ? <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-white/45">{rtl ? 'صامت' : 'Muted'}</span> : null}
+                        </div>
+                      </div>
+                    </div>
+                    {chat.unread ? (
+                      <span className="grid h-6 min-w-6 place-items-center rounded-full bg-[#25d366] px-2 text-[11px] font-semibold text-[#051108] shadow-[0_0_0_4px_rgba(37,211,102,0.12)]">
+                        {chat.unread}
+                      </span>
+                    ) : null}
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
-        </section>
-
-        <aside className="bg-white/3 p-5 sm:p-6">
-          <div className="rounded-[1.6rem] border border-white/8 bg-white/5 p-4">
-            <div className="text-xs uppercase tracking-[0.28em] text-sky-200/80">{i18n.privacy}</div>
-            <div className="mt-3 space-y-3 text-sm leading-7 text-slate-300">
-              <p>{rtl ? 'حظر المستخدمين، البلاغات، واسترجاع الحساب أصبحت جزءًا من طبقة الأمان والخصوصية.' : 'Block users, reporting, and account recovery are part of the privacy and safety layer.'}</p>
-              <p>{rtl ? 'التصميم يجمع بين بساطة واتساب وقابلية التوسع على نمط تيليجرام مع محاذاة RTL دقيقة.' : 'The design blends WhatsApp simplicity with Telegram-scale structure and precise RTL alignment.'}</p>
+          ) : (
+            <div className="flex h-full items-center justify-center px-6 text-center">
+              <div className="max-w-sm rounded-[1.8rem] border border-white/10 bg-white/5 px-6 py-8 shadow-[0_24px_80px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#25d366]/15 text-[#8df0ad]">
+                  {activeTab === 'updates' ? <CircleDashed className="h-6 w-6" /> : activeTab === 'communities' ? <Users className="h-6 w-6" /> : <Phone className="h-6 w-6" />}
+                </div>
+                <h4 className="mt-4 text-xl font-semibold text-white">
+                  {rtl
+                    ? activeTab === 'updates'
+                      ? 'التحديثات'
+                      : activeTab === 'communities'
+                        ? 'المجتمعات'
+                        : 'المكالمات'
+                    : activeTab === 'updates'
+                      ? 'Updates'
+                      : activeTab === 'communities'
+                        ? 'Communities'
+                        : 'Calls'}
+                </h4>
+                <p className="mt-2 text-sm leading-7 text-white/55">
+                  {rtl
+                    ? 'هذا القسم جاهز بنمط واتساب الداكن مع مساحات نظيفة وألوان فخمة.'
+                    : 'This section is ready with a dark WhatsApp-like look and a premium color palette.'}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="mt-4 rounded-[1.6rem] border border-white/8 bg-white/5 p-4">
-            <div className="text-xs uppercase tracking-[0.28em] text-sky-200/80">{rtl ? 'إجراءات الأمان' : 'Safety actions'}</div>
-            <div className="mt-3 space-y-2">
-              <ActionItem icon={ShieldAlert} label={rtl ? 'حظر المستخدم' : 'Block user'} />
-              <ActionItem icon={Clock3} label={rtl ? 'استرجاع الحساب' : 'Account recovery'} />
-              <ActionItem icon={Eye} label={rtl ? 'إشعارات القراءة' : 'Read receipts'} />
-            </div>
+          <button className="absolute bottom-5 right-5 grid h-14 w-14 place-items-center rounded-full bg-[#25d366] text-[#06110a] shadow-[0_18px_45px_rgba(37,211,102,0.35)] transition hover:scale-105">
+            <Plus className="h-6 w-6" />
+          </button>
+        </main>
+
+        <footer className="border-t border-white/10 bg-[#0f151c]/96 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl">
+          <div className="grid grid-cols-4 gap-1">
+            {tabs.map((tab) => {
+              const selected = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex flex-col items-center gap-1 rounded-[1.25rem] px-2 py-2.5 transition ${selected ? 'text-[#9dffbd]' : 'text-white/45 hover:text-white/72'}`}
+                >
+                  <Icon className={`h-5 w-5 ${selected ? 'text-[#25d366]' : ''}`} />
+                  <span className="text-[11px] font-medium">{rtl ? tab.labelAr : tab.labelEn}</span>
+                </button>
+              );
+            })}
           </div>
-        </aside>
+        </footer>
       </div>
     </div>
-  );
-}
-
-function Bubble({ message, rtl, i18n }: { message: Message; rtl: boolean; i18n: ReturnType<typeof t> }) {
-  const statusIcon =
-    message.status === 'read' ? <CheckCheck className="h-4 w-4" /> : message.status === 'delivered' ? <CheckCheck className="h-4 w-4 opacity-70" /> : <Clock3 className="h-4 w-4" />;
-
-  return (
-    <div className={`flex ${message.mine ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[78%] rounded-[1.6rem] px-4 py-3 shadow-lg ${message.mine ? 'bg-sky-400 text-slate-950' : 'border border-white/8 bg-white/5 text-white'}`}>
-        <div className="mb-1 flex items-center justify-between gap-4 text-[11px] uppercase tracking-[0.2em] opacity-70">
-          <span>{message.sender}</span>
-          <span>{message.time}</span>
-        </div>
-        <p className={`text-sm leading-7 ${rtl ? 'text-right' : 'text-left'}`}>{message.text}</p>
-        <div className={`mt-2 flex items-center gap-1 text-[11px] ${message.mine ? 'justify-end text-slate-950/80' : 'text-slate-400'}`}>
-          {statusIcon}
-          <span>{message.mine ? (message.status === 'read' ? i18n.read : message.status === 'delivered' ? i18n.delivered : i18n.sent) : ''}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ActionItem({ icon: Icon, label }: { icon: typeof ShieldAlert; label: string }) {
-  return (
-    <button className="flex w-full items-center gap-3 rounded-2xl border border-white/8 bg-[#071222] px-4 py-3 text-left text-sm text-slate-200 transition hover:border-sky-400/30 hover:bg-[#0b1728]">
-      <Icon className="h-4 w-4 text-sky-300" />
-      <span>{label}</span>
-    </button>
   );
 }
